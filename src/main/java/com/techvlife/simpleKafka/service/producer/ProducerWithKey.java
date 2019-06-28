@@ -1,4 +1,4 @@
-package com.techvlife.simpleKafka.service;
+package com.techvlife.simpleKafka.service.producer;
 
 import com.techvlife.simpleKafka.pojo.KafkaMessage;
 import com.techvlife.simpleKafka.pojo.KafkaProducerResponse;

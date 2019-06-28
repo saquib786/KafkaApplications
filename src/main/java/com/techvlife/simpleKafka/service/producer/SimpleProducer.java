@@ -1,17 +1,18 @@
-package com.techvlife.simpleKafka.service;
+package com.techvlife.simpleKafka.service.producer;
 
-import com.techvlife.simpleKafka.pojo.KafkaProducerResponse;
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
 @Component
-public class ProducerWithCallback {
+public class SimpleProducer {
 
-    public KafkaProducerResponse push_data(String value){
-        KafkaProducerResponse response = new KafkaProducerResponse();
+    public boolean push_data(String value){
+
         try{
             //Define Properties
             //We can get info about properties to be set from : https://kafka.apache.org/documentation/#producerconfigs
@@ -28,26 +29,13 @@ public class ProducerWithCallback {
             //Create producer Record, we are not defining key now
             ProducerRecord<String,String> record = new ProducerRecord<>("first_topic",value);
 
-            producer.send(record, new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                    if(e == null){
-                        response.setOffset(recordMetadata.offset());
-                        response.setPartition(recordMetadata.partition());
-                        response.setTimeStamp(recordMetadata.timestamp());
-                        response.setTopic(recordMetadata.topic());
-                    }else{
-                        response.setErrorMessage(e.getMessage());
-                    }
-                }
-            }); // This is async call. So better flush or wait till it closes
+            producer.send(record); // This is async call. So better flush or wait till it closes
 
             producer.flush();
             producer.close();
-            return response;
+            return true;
         }catch (Exception ex) {
-            response.setErrorMessage("Error in saving data to Kafka");
-            return response;
+            return false;
         }
     }
 }
